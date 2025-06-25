@@ -10,6 +10,9 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +24,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -37,8 +41,9 @@ public class GreetingResourceTest {
     private final static DockerImageName IMAGE_NAME = DockerImageName
             .parse("quay.io/wildfly/wildfly")
             .asCompatibleSubstituteFor("jboss/wildfly");
+
     @Container
-    static GenericContainer wildfly = new GenericContainer<>(IMAGE_NAME)
+    static GenericContainer<?> wildfly = new GenericContainer<>(IMAGE_NAME)
             .withExposedPorts(8080, 9990)
             .withCreateContainerCmdModifier(cmd -> {
                 var createAdmin = cmd.withCmd("/opt/jboss/wildfly/bin/add-user.sh", "admin", "Admin@123", "--silent").exec().getRawValues();
@@ -47,10 +52,21 @@ public class GreetingResourceTest {
             .withCommand("/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0");
 
     @BeforeDeployment
-    public static Archive beforeDeployment(Archive archive) {
+    public static Archive<?> beforeDeployment(Archive<?> archive) {
         Wait.forListeningPort().waitUntilReady(wildfly);
-        LOGGER.log(Level.INFO, "deployment files: {}", archive.toString(true));
-        return archive;
+
+        File[] extraJars = Maven
+                .resolver()
+                .loadPomFromFile("pom.xml")
+                .importCompileAndRuntimeDependencies()
+                .resolve("org.assertj:assertj-core", "org.testcontainers:testcontainers", "org.testcontainers:junit-jupiter")
+                .withTransitivity()
+                .asFile();
+        var war = ShrinkWrap.create(WebArchive.class).merge(archive)
+                .addAsLibraries(extraJars);
+
+        LOGGER.log(Level.INFO, "deployment files: {}", war.toString(true));
+        return war;
     }
 
     @ArquillianResource
