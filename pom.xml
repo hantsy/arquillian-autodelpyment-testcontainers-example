@@ -42,7 +42,7 @@
 
         <!-- Glassfish  -->
         <glassfish.version>7.0.14</glassfish.version>
-        <jersey.version>3.1.7</jersey.version>
+        <jersey.version>3.1.10</jersey.version>
              
         <!-- WildFly -->
         <wildfly.version>32.0.0.Final</wildfly.version>
