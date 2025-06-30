@@ -38,7 +38,7 @@
         <!-- Arquillian 1.7.0 adds Jakarta EE 9 and JUnit 5 support-->
         <arquillian-bom.version>1.8.0.Final</arquillian-bom.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
-        <testcontainers.version>1.19.8</testcontainers.version>
+        <testcontainers.version>1.21.3</testcontainers.version>
 
         <!-- Glassfish  -->
         <glassfish.version>7.0.14</glassfish.version>
