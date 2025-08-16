@@ -33,7 +33,7 @@
         <cargo-maven3-plugin.version>1.10.21</cargo-maven3-plugin.version>
 
         <!-- Jakarta EE API 10-->
-        <jakartaee-api.version>10.0.0</jakartaee-api.version>  
+        <jakartaee-api.version>11.0.0</jakartaee-api.version>  
         
         <!-- Arquillian 1.7.0 adds Jakarta EE 9 and JUnit 5 support-->
         <arquillian-bom.version>1.8.0.Final</arquillian-bom.version>
